@@ -13,14 +13,13 @@
 		"lint": "turbo run lint",
 		"type-check": "turbo run type-check",
 		"test": "turbo run test",
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
 		"compile:cli": "turbo run deemix-cli#compile",
 		"ci": "turbo run lint type-check build test",
-		"clean": "rimraf .turbo node_modules --glob **/dist **/out **/node_modules **/.turbo **/tsconfig.tsbuildinfo",
-		"prepare": "husky"
+		"clean": "rimraf .turbo node_modules --glob **/dist **/out **/node_modules **/.turbo **/tsconfig.tsbuildinfo"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^19.8.1",
-		"@commitlint/config-conventional": "^19.8.1",
 		"@eslint/js": "^9.33.0",
 		"@total-typescript/tsconfig": "^1.0.4",
 		"@types/node": "^24.2.1",
@@ -28,7 +27,6 @@
 		"eslint": "^9.33.0",
 		"eslint-config-prettier": "^10.1.8",
 		"globals": "^16.3.0",
-		"husky": "^9.1.7",
 		"npm-run-all2": "^8.0.4",
 		"prettier": "^3.6.2",
 		"rimraf": "^6.0.1",

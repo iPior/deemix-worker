@@ -13,6 +13,9 @@ progress, and transfer completed files back to the requesting device.
 The worker service and shared client/server protocol have not been implemented
 yet.
 
+See [`docs/PROJECT.md`](docs/PROJECT.md) for the agreed architecture, protocol,
+security requirements, and implementation sequence.
+
 ## Development
 
 This repository requires Node.js 24 and uses pnpm workspaces with Turborepo.
