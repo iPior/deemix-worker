@@ -1,158 +1,41 @@
-# Deemix
+# deemix-worker
 
-This is the monorepo for the revived Deemix project, originally created by the very talented [RemixDev](https://gitlab.com/RemixDev).
+A work-in-progress remote Deemix worker and command-line client. The worker will
+run on a home server, accept download jobs from authenticated clients, stream
+progress, and transfer completed files back to the requesting device.
 
-The docker image was heavily inspired by the fantastic work of [Bockiii](https://gitlab.com/Bockiii/deemix-docker).
+## Current packages
 
-### Packages in this Repo
+- `deezer-sdk`: Deezer API and session integration.
+- `deemix`: Downloading, decryption, metadata, and file organization.
+- `deemix-cli`: Existing local CLI retained as the scaffold for the remote client.
 
-- **deezer-sdk**: Wrapper for Deezer's [API](https://developers.deezer.com/api)
-- **deemix**: The brains of the operation
-- **webui**: [Vue.js](https://vuejs.org/) + [Express](https://expressjs.com/) web interface
-- **gui**: Packaged [Electron](https://www.electronjs.org/) app
+The worker service and shared client/server protocol have not been implemented
+yet.
 
-<a href='https://ko-fi.com/L3L71IQN1F' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+## Development
 
-## Downloads
-
-### Standalone Electron App
-
-[https://github.com/bambanah/deemix/releases](https://github.com/bambanah/deemix/releases)
-
-Note: The app is not signed (because it's crazy expensive), so you'll need to disable the security warnings when running it.
-
-#### For MacOS
+This repository requires Node.js 24 and uses pnpm workspaces with Turborepo.
 
 ```bash
-xattr -d com.apple.quarantine /Applications/deemix.app
+corepack enable
+pnpm install
+pnpm run ci
 ```
 
-Modify path if installed to a different locaiton
-
-### Docker Image
-
-Deemix is also available as a [docker image](https://github.com/bambanah/deemix/pkgs/container/deemix).
-
-#### Example Usage
+Run the current CLI from the repository with:
 
 ```bash
-docker run -d --name Deemix \
-  -v /path/to/music:/downloads \
-  -v /path/to/config:/config \
-  -p 6595:6595 \
-  ghcr.io/bambanah/deemix:latest
+pnpm --filter deemix-cli start -- <url>
 ```
 
-#### Parameters
+## Upstream
 
-All paremeters are optional - if not specified, the default value will be used.
+This project is derived from [bambanah/deemix](https://github.com/bambanah/deemix),
+which revived the original Deemix project created by RemixDev. The `upstream`
+Git remote is retained so fixes to the core packages can be reviewed and
+integrated.
 
-You'll probably want to at least map the download and config folders, as well as the port.
+## License
 
-| Parameter                               | Description                                               | Default      |
-| --------------------------------------- | --------------------------------------------------------- | ------------ |
-| `-v /path/to/music:/downloads`          | Path to the music folder                                  |              |
-| `-v /path/to/config:/config`            | Path to the config folder                                 |              |
-| `-p 6595:6595`                          | Port mapped to the host                                   |              |
-| `-e DEEMIX_SERVER_PORT=6595`            | Port to expose the server on                              | `6595`       |
-| `-e DEEMIX_DATA_DIR=/config`            | Path to the config folder                                 | `/config`    |
-| `-e DEEMIX_MUSIC_DIR=/downloads`        | Path to the music folder                                  | `/downloads` |
-| `-e DEEMIX_HOST=0.0.0.0`                | Host to bind the server to                                | `0.0.0.0`    |
-| `-e DEEMIX_SINGLE_USER=true`            | Enables single user mode                                  | `true`       |
-| `-e PUID=1000`                          | User ID to use for downloaded files                       | `1000`       |
-| `-e PGID=1000`                          | Group ID to use for downloaded files                      | `1000`       |
-| `-e UMASK_SET=022`                      | Set umask                                                 | `022`        |
-| `-e DISABLE_OWNERSHIP_CHECK=true`       | Disable ownership fix on container start globally         |              |
-| `-e DISABLE_OWNERSHIP_CHECK_MUSIC=true` | Disable ownership fix on container start for music files  |              |
-| `-e DISABLE_OWNERSHIP_CHECK_DATA=true`  | Disable ownership fix on container start for config files |              |
-
-#### CLI
-
-The `deemix` CLI is available inside the running container, so downloads can be triggered from
-the host (from a cron job, for example):
-
-```bash
-docker exec Deemix deemix https://www.deezer.com/track/3135556
-docker exec Deemix deemix -b flac -p /downloads/singles https://www.deezer.com/track/3135556
-```
-
-| Flag                | Description                                             |
-| ------------------- | ------------------------------------------------------- |
-| `-p, --path <path>` | Downloads into the given folder instead of `/downloads` |
-| `-b, --bitrate <t>` | Overrides the configured bitrate - `128`, `320`, `flac` |
-
-You must be logged in first. Logging in through the web UI is enough - the CLI reads the same
-credentials. Alternatively, run it interactively once to be prompted for an ARL:
-
-```bash
-docker exec -it Deemix deemix https://www.deezer.com/track/3135556
-```
-
-Without a valid ARL and without a TTY, the command exits 1 rather than waiting for input.
-Downloads are performed as `PUID:PGID`, so files are owned the same way as web UI downloads.
-
-### Nix Flake
-
-Build and run the webui server or cli reproducibly with [Nix](https://nixos.org) (flakes enabled):
-
-```bash
-nix run github:bambanah/deemix#webui      # start the webui server on 0.0.0.0:6595
-nix run github:bambanah/deemix#cli -- <url>  # download a track/playlist
-
-nix build github:bambanah/deemix#webui    # build only, result in ./result
-```
-
-A dev shell with the pinned node + pnpm is available via `nix develop`.
-
-## Feature requests
-
-Before asking for a feature make sure there isn't already an [open issue](https://github.com/bambanah/deemix/issues).
-
-## Developing
-
-This repo uses [pnpm](https://pnpm.io/) for package management and [Turborepo](https://turbo.build/repo/docs) for monorepo management.
-
-### Dependencies
-
-- Install Node.js 24.x
-- Enable pnpm:
-  ```bash
-  corepack enable
-  ```
-
-### Local Development
-
-1. Clone the repository
-   ```bash
-   git clone https://github.com/bambanah/deemix.git
-   # - OR -
-   gh repo clone bambanah/deemix
-   ```
-2. Install dependencies
-   ```bash
-   pnpm i
-   ```
-3. Start development server
-
-   ```bash
-   pnpm dev
-   ```
-
-   - This will start the development server on port 6595
-   - It will also watch for changes in dependencies and hot reload the app
-
-### Building the Docker Image
-
-A docker image can be built with the provided Dockerfile.
-
-```bash
-docker build -t deemix .
-```
-
-### Packaging the Electron GUI
-
-A distributable GUI app can be built with the following command:
-
-```bash
-pnpm make
-```
+Licensed under the GNU General Public License v3.0. See `LICENSE.txt`.

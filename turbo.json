@@ -19,14 +19,6 @@
 		"test": {
 			"dependsOn": ["^build"]
 		},
-		"package": {
-			"dependsOn": ["build", "^build"],
-			"outputs": ["dist/**", "out/**"]
-		},
-		"make": {
-			"dependsOn": ["build", "^build"],
-			"outputs": ["dist/**", "out/**"]
-		},
 		"compile": {
 			"dependsOn": ["build", "^build"],
 			"outputs": ["dist/**", "out/**"]

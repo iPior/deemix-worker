@@ -26,8 +26,6 @@ release/
 out/
 
 .DS_Store
-packages/webui/public/js/*
 
 .turbo
 tsconfig.tsbuildinfo
-vite.config.*.timestamp-*
